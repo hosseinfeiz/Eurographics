@@ -1,7 +1,6 @@
 \begin{abstract}
-   This work introduces a novel framework for 3D pose estimation and motion synthesis in combat sports, leveraging a sparse multi-camera setup and computer vision-based tracking. The approach employs epipolar constraints and long-term video object segmentation to ensure consistent tracking across views and high-quality 2D pose extraction using a top-down transformer-based approach. The 3D pose estimation is achieved through weighted triangulation, spline fitting, and extended Kalman filtering, enhanced by kinematic optimization and physics-based trajectory refinement. Our dataset comprises four hours of two-person boxing sessions, capturing precise skeleton motions and synthetic VR sensor data. We are currently developing a generative motion diffusion model for interactions between two individuals. This model introduces a novel architecture that utilizes a seq2seq model to generate responsive and meaningful motions for a sequence of VR sensor input data.
-
-To ensure physical plausibility, we propose latent physics optimization for the generated motions. This optimization aims to refine contacts and movements, ensuring they adhere to realistic physical constraints.
+   Combat sports pose significant challenges for motion capture due to dynamic interactions and crowded backgrounds. Traditional methods like optical marker tracking, IMU-based solutions are not practical due to their intrusive nature, and Monocular vision-based approaches are hindered by occlusions, prompting the development of a multi-stage, multi-view tracking pipeline. This pipeline utilizes kinematic optimization to fuse 2D keypoints from multiple cameras, followed by physics-based trajectory optimization using model predictive control to enhance realism.
+   Furthermore, leveraging interaction datasets attain from multi-view setup, the pipeline supports multi-person motion synthesis. It employs a seq2seq model to generate interactions from sparse VR headset inputs, and the whole body poses. Finally, latent optimization ensures motions adhere to motion prior and satisfies high level criteria to lifelike animations suitable for combat sports analysis and training applications.
 
 \begin{CCSXML}
 <ccs2012>
@@ -27,13 +26,8 @@ To ensure physical plausibility, we propose latent physics optimization for the 
 %-------------------------------------------------------------------------
 \section{Introduction}
 
-Combat sports present significant challenges for motion capture due to numerous close-proximity interactions and frequently crowded backgrounds. 
-Optical markers tracking is precise in a laboratory setting, yet are impractical for combat sports due to the highly dynamic motions and frequent collisions that lead to calibration issues with markers. Inertial measurement unit (IMU) based solutions suffer from global positional drift, affecting inter-athlete distances. Monocular vision-based approaches leave athletes unencumbered by tracking equipment, but they lack precision due to insufficient visual data arising from frequent occlusions. Issues due to occlusion can however be mitigated by incorporating camera data from multiple viewpoints, an idea that we built on in our tracking pipeline.
-
-We propose a multi-stage multi-view tracking pipeline that is capable of reconstructing high-quality 3D motion of athletes participating in combat sports, such as boxing. Our approach fuses 2D keypoints from multiple camera views by a kinematic optimization.  This is followed by a physics-based trajectory optimization utilizing model predictive control to eliminate non-physical artifacts. 
 
 \section{Pose Estimation}
-\textbf{Epipolar Geometry:} Epipolar constraints use geometric lines (epipolar lines) to associate corresponding points across different camera views. These constraints are defined by the fundamental matrix ($\mathbf{F}$), facilitating efficient matching by restricting search space along these lines.
 
 \textbf{Tracking 2D and 3D Data:} Using epipolar constraints and long-term video object segmentation Triangulation computes 3D positions from 2D keypoints across multiple cameras using their projection matrices. It solves a linear system to determine 3D coordinates, weighting contributions based on 2D keypoints’ confidence. Techniques like SVD solve this system, with subsequent filtering and smoothing ensuring robust 3D reconstructions, even in the presence of noise and outliers.
 
