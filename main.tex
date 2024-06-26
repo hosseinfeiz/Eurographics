@@ -1,0 +1,137 @@
+% ---------------------------------------------------------------------------
+% Author guideline and sample document for EG publication using LaTeX2e input
+% D.Fellner, v1.22, Jan 22, 2024
+
+\documentclass{egpubl}
+ 
+% --- for  Annual CONFERENCE
+% \ConferenceSubmission   % uncomment for Conference submission
+% \ConferencePaper        % uncomment for (final) Conference Paper
+% \STAR                   % uncomment for STAR contribution
+% \Tutorial               % uncomment for Tutorial contribution
+% \ShortPresentation      % uncomment for (final) Short Conference Presentation
+% \Areas                  % uncomment for Areas contribution
+% \Education              % uncomment for Education contribution
+\Poster                 % uncomment for Poster contribution
+% \DC                     % uncomment for Doctoral Consortium
+%
+% --- for  CGF Journal
+% \JournalSubmission    % uncomment for submission to Computer Graphics Forum
+% \JournalPaper         % uncomment for final version of Journal Paper
+%
+% --- for  CGF Journal: special issue
+% \SpecialIssueSubmission    % uncomment for submission to , special issue
+% \SpecialIssuePaper         % uncomment for final version of Computer Graphics Forum, special issue
+%                          % EuroVis, SGP, Rendering, PG
+% --- for  EG Workshop Proceedings
+% \WsSubmission      % uncomment for submission to EG Workshop
+% \WsPaper           % uncomment for final version of EG Workshop contribution
+% \WsSubmissionJoint % for joint events, for example ICAT-EGVE
+% \WsPaperJoint      % for joint events, for example ICAT-EGVE
+% \WsPaperJointdemo         % uncomment for final version of EG Workshop contribution
+% \WsPaperJointposter         % uncomment for final version of EG Workshop contribution 
+% \WsPoster          % uncomment for Poster contribution
+% \WsShortPaper      % uncomment for Short Paper contribution
+% \Expressive        % for SBIM, CAe, NPAR
+% \DigitalHeritagePaper
+% \PaperL2P          % for events EG only asks for License to Publish
+
+% --- for EuroVis 
+% for full papers use \SpecialIssuePaper
+% \STAREurovis   % for EuroVis additional material 
+% \EuroVisPoster % for EuroVis additional material 
+% \EuroVisShort  % for EuroVis additional material
+% \MedicalPrize  % uncomment for Medical Prize (Dirk Bartz) contribution, since 2021 part of EuroVis
+% \EuroVisEducation              % uncomment for Education contribution
+
+% Licences: for CGF Journal (EG conf. full papers and STARs, EuroVis conf. full papers and STARs, SR, SGP, PG)
+% please choose the correct license
+% \CGFStandardLicense
+%\CGFccby
+%\CGFccbync
+%\CGFccbyncnd
+
+% !! *please* don't change anything above
+% !! unless you REALLY know what you are doing
+% ------------------------------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{dfadobe}  
+\usepackage{tikz}
+\usepackage{overpic}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{cite}  % comment out for biblatex with backend=biber
+\usetikzlibrary{arrows, decorations.markings, arrows.meta,positioning,shadows,shapes.geometric,automata,positioning,fit,arrows.meta,calc,bending}
+
+
+
+% ---------------------------
+%\biberVersion
+\BibtexOrBiblatex
+%\usepackage[backend=biber,bibstyle=EG,citestyle=alphabetic,backref=true]{biblatex} 
+%\addbibresource{egbibsample.bib}
+
+%%%the style file EG-sub.bbx does not truncate authors' list to 3 if number of authors are more than 4.
+%%%This is important for checking conflicts during review assigment phase. For final version please use EG.bbx,
+%%%using et al. for more then 4 authors.
+
+% ---------------------------  
+\electronicVersion
+\PrintedOrElectronic
+% for including postscript figures
+% mind: package option 'draft' will replace PS figure by a filename within a frame
+
+\usepackage{egweblnk} 
+% end of prologue
+
+% ---------------------------------------------------------------------
+% EG author guidelines plus sample file for EG publication using LaTeX2e input
+% D.Fellner, v2.04, Dec 14, 2023
+
+
+\title[EG poster]%
+      {Markerless Multi-person Pose Estimation and Motion Synthesis for Combat Sports}
+
+% for anonymous conference submission please enter your SUBMISSION ID
+% instead of the author's name (and leave the affiliation blank) !!
+% for final version: please provide your *own* ORCID in the brackets following \orcid; see https://orcid.org/ for more details.
+\author[Hossein]
+{\parbox{\textwidth}{\centering 
+        Hossein Feiz$^1$, David Labbé$^2$, Sheldon Andrews$^3$
+        }
+        \\
+{\parbox{\textwidth}{\centering 
+        École de technologie supérieure (ETS), Montreal, Canada
+       }
+}
+}
+% ------------------------------------------------------------------------
+
+% if the Editors-in-Chief have given you the data, you may uncomment
+% the following five lines and insert it here
+%
+% \volume{36}   % the volume in which the issue will be published;
+% \issue{1}     % the issue number of the publication
+% \pStartPage{1}      % set starting page
+
+
+%-------------------------------------------------------------------------
+\begin{document}
+
+% uncomment for using teaser
+\teaser{
+ \includegraphics[width=0.9\linewidth]{pipeline.pdf}
+ \centering
+  \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses using ViTPose. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions , initial pose state  and velocity state of the humanoid , serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
+\label{fig:teaser}
+}
+
+\maketitle
+%-------------------------------------------------------------------------
+
+\input{context}
+
+\end{document}
+{}
