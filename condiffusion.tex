@@ -5,20 +5,20 @@
 \tikzstyle{process}=[draw, font=\fontsize{5}{4.8}\selectfont, rectangle, rounded corners, fill=yellow!20, minimum width=1cm, auto, on grid, minimum height=1cm, align=center]
 \tikzstyle{process4}=[draw, font=\small, rectangle, rounded corners, fill=yellow!20, text width=3cm, auto, on grid, align=center]
 \tikzstyle{decision}=[draw, font=\small, rectangle, rounded corners, fill=red!20, text width=3cm, auto, on grid, align=center]
-\tikzstyle{process2}=[draw, font=\small, rectangle, rounded corners, fill=cyan!20, text width=3cm, auto, on grid, align=center]
+\tikzstyle{process2}=[draw, font=\fontsize{5}{4.8}, rectangle, rounded corners, fill=cyan!20, text width=2cm, auto, on grid, align=center]
 \tikzstyle{circlenode}=[draw, circle, fill=red!20, minimum size=1mm]
-\tikzstyle{process3}=[draw, font=\fontsize{5}{4.8}\selectfont, rectangle, rounded corners, fill=cyan!20, rotate=-90, auto, on grid, align=center]
+\tikzstyle{process3}=[draw, font=\fontsize{7}{4.8}\selectfont, rectangle, rounded corners, fill=cyan!20, rotate=-90, auto, on grid, align=center]
 \tikzstyle{process4}=[draw, font=\fontsize{5}{4.8}\selectfont, rectangle, rounded corners, fill=yellow!20, rotate=-90, auto, on grid, align=center]
 \tikzstyle{vecArrow} = [thick, decoration={markings, mark=at position 1 with {\arrow[semithick]{open triangle 60}}}, double distance=1.4pt, shorten >= 5.5pt, preaction = {decorate}, postaction = {draw, line width=1.4pt, white, shorten >= 4.5pt}]
 \tikzstyle{vecArrow1} = [thick, decoration={markings, mark=at position 0.9 with {}}, double distance=1.4pt, shorten >= 5.5pt, preaction = {decorate}, postaction = {draw, line width=1.4pt, white, shorten >= 4.5pt}]
 \tikzstyle{innerWhite} = [semithick, white, line width=1.4pt, shorten >= 4.5pt]
 
 \node[process4] (input) at (-4.5, -0.35) {$(\theta_{6D}^{l}, \theta_{6D}^{r} \theta_{6D}^{h}, \omega_{6D}^{l}, \omega_{6D}^{r} \omega_{6D}^{h}, x^{l}, x^{r} x^{h}, v^{l}, v^{r} v^{h})_i$};
-\node[process] (seq2seq) at (-3, -0.35) {Diff-Seq2Seq};
+\node[process3] (seq2seq) at (-3, -0.35) {2.Diff Seq2Seq};
 \draw[vecArrow] (input) -- (seq2seq);
 \node[process4] (output) at (-1.5, -0.35) {$(\theta_{6D}^{l}, \theta_{6D}^{r} \theta_{6D}^{h}, \omega_{6D}^{l}, \omega_{6D}^{r} \omega_{6D}^{h}, x^{l}, x^{r} x^{h}, v^{l}, v^{r} v^{h})_o$};
 \draw[vecArrow] (seq2seq) -- (output);
-\node[process] (prior) at (1, -0.35) {Conditioned DiffPrior};
+\node[process2] (prior) at (1, -0.35) {1.Conditioned DiffPrior};
 \node[circlenode] (yt) at (3.4, -0.35){$y_t$};
 \node[circlenode] (xt) at (1, 1){$x_T$};
 \node[circlenode] (xt1) at (-3, 1.2){$x_T$};
@@ -27,9 +27,9 @@
 \draw[vecArrow] (xt) -- (prior);
 
 \draw[vecArrow] (output) -- (prior);
-\node[process2] (optimization) at (1, -2.4) {Optimization};
+\node[process2] (optimization) at (1, -2.4) {3.Latent Optimization};
 \draw[vecArrow] (prior) -- (optimization);
-\draw[vecArrow] (1.7, -2.15) tonode[anchor=east] {\scriptsize $\nabla \mathcal{L}$} (1.7, -0.9);
+\draw[vecArrow] (1.7, -1.95) tonode[anchor=east] {\scriptsize $\nabla \mathcal{L}$} (1.7, -0.75);
 
 \end{tikzpicture}
   }
