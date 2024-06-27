@@ -158,7 +158,7 @@ Initially, the optimization initializes shape parameters ($\beta \in \mathbb{R}^
 
 Key components of the objective function include:
 \begin{figure*}[htp]
-\includegraphics[width=0.9\linewidth]{pipeline.pdf}
+\includegraphics[width=0.8\linewidth]{pipeline.pdf}
  \centering
   \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
 \end{figure*}
@@ -178,11 +178,10 @@ The dynamics optimization stage aims to refine motion trajectories by considerin
 
 \begin{figure}[htbp]
   \centering
-
-  \include{condiffusion}
-
-  \caption{\label{fig:condtion-diffusion}
-           The condition for the seq2seq model contains the VR sensor information of the player and the output is the corresponding synthetic VR information for the opponent at each sequence. The diffusion prior is conditioned on the opponent synthetic information and produces the whole body pose for the opponent. The optimization in loop make sure the output motion has the desired trajectories based on a high level loss function.}
+  \includegraphics{condiffusion}
+  \caption{\label{fig:condition-diffusion}
+           The condition for the seq2seq model contains the VR sensor information of the player and the output is the corresponding synthetic VR information for the opponent at each sequence. The diffusion prior is conditioned on the opponent synthetic information and produces the whole body pose for the opponent. The optimization in loop makes sure the output motion has the desired trajectories based on a high-level loss function.}
+    \label{fig:condtion-diffusion}
 \end{figure}
 
 Figure~\ref{fig:condtion-diffusion} illustrate the main components of the motion synthesis pipeline. Each component will be discussed in more detail below.
