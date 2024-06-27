@@ -147,7 +147,7 @@
 \end{abstract}  
 %-------------------------------------------------------------------------
 \section{Introduction}
-Accurately capturing the dynamic motions of combat sports poses significant challenges due to interactions and crowded backgrounds. Traditional methods, such as optical markers and IMUs, are impractical because they are intrusive or suffer from occlusions. To address these issues, we propose a multi-stage, multi-view tracking pipeline that uses kinematic optimization to fuse 2D keypoints from multiple cameras. This is followed by physics-based trajectory optimization using model predictive control to enhance realism. Additionally, our pipeline supports multi-person motion synthesis using interaction datasets from a multi-view setup, employing a seq2seq model to generate interactions from sparse VR headset inputs and a diffusion prior model to produce whole-body poses. Latent optimization ensures that the motions adhere to motion priors and meet high-level criteria, making the system suitable for combat sports analysis and training.
+We propose a multi-stage, multi-view tracking pipeline that uses kinematic and dynamics optimization to fuse 2D keypoints from multiple cameras. Additionally, our pipeline supports multi-person motion synthesis using interaction datasets from a multi-view tracking pipeline, employing a seq2seq model to generate interactions from sparse VR headset inputs and a diffusion prior model to produce whole-body poses. Latent optimization ensures that the motions adhere to motion priors and meet high-level criteria, making the system suitable for combat sports analysis and training.
 \section{Pose Estimation}
 
 \textbf{Tracking 2D and 3D Data:} Using epipolar constraints and long-term video object segmentation we produce consistent ids for everyone, these ids are used to produce 2D joints positions for tracking targets, we then use linear triangulation and Kalman estimation to produce robust 3D joints positions for each individual even in the presence of noise and outliers.   
@@ -184,7 +184,7 @@ The dynamics optimization stage aims to refine motion trajectories by considerin
     \label{fig:condtion-diffusion}
 \end{figure}
 
-Figure~\ref{fig:condtion-diffusion} illustrate the main components of the motion synthesis pipeline. Each component will be discussed in more detail below.
+Figure~\ref{fig:condtion-diffusion} illustrate the main components of the motion synthesis pipeline. Each component will be discussed in more details below.
 
 
 
