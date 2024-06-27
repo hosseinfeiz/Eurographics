@@ -158,7 +158,7 @@ Initially, the optimization initializes shape parameters ($\beta \in \mathbb{R}^
 
 Key components of the objective function include:
 \begin{figure*}[htp]
-\includegraphics[width=0.8\linewidth]{pipeline.pdf}
+\includegraphics[width=0.73\linewidth]{pipeline.pdf}
  \centering
   \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
 \end{figure*}
