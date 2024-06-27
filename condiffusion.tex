@@ -39,10 +39,10 @@
 \tikzstyle{vecArrow1} = [thick, decoration={markings, mark=at position 0.9 with {}}, double distance=1.4pt, shorten >= 5.5pt, preaction = {decorate}, postaction = {draw, line width=1.4pt, white, shorten >= 4.5pt}]
 \tikzstyle{innerWhite} = [semithick, white, line width=1.4pt, shorten >= 4.5pt]
 
-\node[process4] (input) at (-4.5, -0.35) {$(\theta_{6D}^{l}, \theta_{6D}^{r} \theta_{6D}^{h}, \omega_{6D}^{l}, \omega_{6D}^{r} \omega_{6D}^{h}, x^{l}, x^{r} x^{h}, v^{l}, v^{r} v^{h})_i$};
+\node[process4] (input) at (-4.5, -0.35) {${VR}_{in}$};
 \node[process3] (seq2seq) at (-3, -0.35) {Diff Seq2Seq};
 \draw[vecArrow] (input) -- (seq2seq);
-\node[process4] (output) at (-1.5, -0.35) {$(\theta_{6D}^{l}, \theta_{6D}^{r} \theta_{6D}^{h}, \omega_{6D}^{l}, \omega_{6D}^{r} \omega_{6D}^{h}, x^{l}, x^{r} x^{h}, v^{l}, v^{r} v^{h})_o$};
+\node[process4] (output) at (-1.5, -0.35) {${VR}_{out}$};
 \draw[vecArrow] (seq2seq) -- (output);
 \node[process2] (prior) at (1, -0.35) {Conditioned DiffPrior};
 \node[circlenode] (yt) at (3.5, -0.35){$y_t$};
@@ -53,9 +53,9 @@
 \draw[vecArrow] (xt) -- (prior);
 
 \draw[vecArrow] (output) -- (prior);
-\node[process2] (optimization) at (1, -2.4) {Latent Optimization};
+\node[process2] (optimization) at (1, -1.4) {Latent Optimization};
 \draw[vecArrow] (prior) -- (optimization);
-\draw[vecArrow] (1.7, -2.1) tonode[anchor=east] {\scriptsize $\nabla \mathcal{L}$} (1.7, -0.6);
+\draw[vecArrow] (1.7, -1.1) tonode[anchor=east] {\scriptsize $\nabla \mathcal{L}$} (1.7, -0.6);
 
 
 \end{tikzpicture}}
