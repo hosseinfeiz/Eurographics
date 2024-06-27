@@ -179,12 +179,11 @@ The dynamics optimization stage aims to refine motion trajectories by considerin
 \begin{figure}[htbp]
   \centering
   \includegraphics{condiffusion}
-  \caption{\label{fig:condition-diffusion}
-           The condition for the seq2seq model contains the VR sensor information of the player and the output is the corresponding synthetic VR information for the opponent at each sequence. The diffusion prior is conditioned on the opponent synthetic information and produces the whole body pose for the opponent. The optimization in loop makes sure the output motion has the desired trajectories based on a high-level loss function.}
+  \caption{motion synthesis pipeline}
     \label{fig:condtion-diffusion}
 \end{figure}
 
-Figure~\ref{fig:condtion-diffusion} illustrate the main components of the motion synthesis pipeline. Each component will be discussed in more details below.
+Figure~\ref{fig:condtion-diffusion} illustrate the main components of the motion synthesis pipeline. The condition for the seq2seq model contains the VR sensor information of the player and the output is the corresponding synthetic VR information for the opponent at each sequence. The diffusion prior is conditioned on the opponent synthetic information and produces the whole body pose for the opponent. The optimization in loop makes sure the output motion has the desired trajectories based on a high-level loss function.
 
 
 
