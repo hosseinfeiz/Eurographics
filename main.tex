@@ -110,12 +110,12 @@
 \begin{document}
 
 % uncomment for using teaser
-\teaser{
- \includegraphics[width=0.9\linewidth]{pipeline.pdf}
- \centering
-  \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
-\label{fig:teaser}
-}
+% \teaser{
+%  \includegraphics[width=0.9\linewidth]{pipeline.pdf}
+%  \centering
+%   \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
+% \label{fig:teaser}
+% }
 
 \maketitle
 %-------------------------------------------------------------------------
@@ -146,7 +146,8 @@
 \printccsdesc   
 \end{abstract}  
 %-------------------------------------------------------------------------
-
+\section{Introduction}
+Accurately capturing the dynamic motions of combat sports poses significant challenges due to interactions and crowded backgrounds. Traditional methods, such as optical markers and IMUs, are impractical because they are intrusive or suffer from occlusions. To address these issues, we propose a multi-stage, multi-view tracking pipeline that uses kinematic optimization to fuse 2D keypoints from multiple cameras. This is followed by physics-based trajectory optimization using model predictive control to enhance realism. Additionally, our pipeline supports multi-person motion synthesis using interaction datasets from a multi-view setup, employing a seq2seq model to generate interactions from sparse VR headset inputs and a diffusion prior model to produce whole-body poses. Latent optimization ensures that the motions adhere to motion priors and meet high-level criteria, making the system suitable for combat sports analysis and training.
 \section{Pose Estimation}
 
 \textbf{Tracking 2D and 3D Data:} Using epipolar constraints and long-term video object segmentation we produce consistent ids for everyone, these ids are used to produce 2D joints positions for tracking targets, we then use linear triangulation and Kalman estimation to produce robust 3D joints positions for each individual even in the presence of noise and outliers.   
@@ -156,7 +157,11 @@
 Initially, the optimization initializes shape parameters ($\beta \in \mathbb{R}^{10}$) of the SMPL model based on 3D keypoints obtained through triangulation. Subsequently, it iteratively adjusts shape and pose parameters ($\theta \in \mathbb{R}^{72}$) to refine the pose estimation.
 
 Key components of the objective function include:
-
+\begin{figure*}[htp]
+\includegraphics[width=0.9\linewidth]{pipeline.pdf}
+ \centering
+  \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
+\end{figure*}
 \begin{itemize}
     \item \textbf{2D Re-projection Loss} ($\mathrm{L}_\text{2D}$): Aligns 3D joints with 2D joints across multiple camera views, emphasizing joints with high-confidence detections using a robust error function.
     \item \textbf{3D Alignment Loss} ($\mathrm{L}_\text{3D}$): Computes the Euclidean distance between predicted 3D joint positions and triangulated 3D keypoints, weighted by their confidence scores.
@@ -166,6 +171,7 @@ Key components of the objective function include:
  This comprehensive approach ensures accurate and lifelike pose estimation suitable for applications in sports biomechanics and animation.
 
 %-------------------------------------------------------------------------
+
 \textbf{Dynamics Optimization:} Output motion of the kinematics optimization contains high-frequency artifacts. To mitigate this, a second stage employs dynamics optimization using a physics-based humanoid model. This model, derived from joint positions and landmarks of an SMPL mesh, creates an articulated rigid-body structure with capsule collision geometry, featuring 56 joint-angle degrees of freedom and a 6 degree of freedom root joint.
 
 The dynamics optimization stage aims to refine motion trajectories by considering joint torques and biomechanical constraints within a physical environment. It computes joint torques using an iterative Linear Quadratic Regulator (iLQR) algorithm, which optimizes control inputs to smooth and stabilize motion trajectories. This approach accounts for contact forces and body dynamics, enhancing the overall quality and naturalness of the generated motions by iteratively refining control trajectories over short time horizons.
