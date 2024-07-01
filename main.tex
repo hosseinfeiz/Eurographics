@@ -120,7 +120,7 @@
 %-------------------------------------------------------------------------
 
 \begin{abstract}
-   Combat sports pose significant challenges for motion capture due to dynamic interactions and crowded backgrounds. Traditional methods like optical marker tracking, IMU-based solutions are not practical due to their intrusive nature, and Monocular vision-based approaches are affected by occlusions, encouraging the development of a multi-stage, multi-view tracking pipeline. This pipeline utilizes kinematic optimization to fuse 2D keypoints from multiple cameras, followed by physics-based trajectory optimization using model predictive control to enhance realism.
+   This paper introduces a novel framework for 3D pose estimation in combat sports. Utilizing a sparse multi-camera setup, our approach employs a computer vision-based tracker to extract 2D pose predictions from each camera view, enforcing consistent tracking targets across views with epipolar constraints and long-term video object segmentation. Through a top-down transformer-based approach, we ensure high-quality 2D pose extraction. We estimate the 3D position via weighted triangulation, spline fitting and extended Kalman filtering. By employing kinematic optimization and physics-based trajectory refinement, we achieve state-of-the-art accuracy and robustness under challenging conditions such as occlusion and rapid movements. Experimental validation on diverse datasets, including a custom dataset featuring elite boxers, underscores the effectiveness of our approach. Additionally, we contribute a valuable sparring video dataset to advance research in multi-person tracking for sports.
 
 
 \begin{CCSXML}
@@ -146,16 +146,9 @@
 \end{abstract}  
 %-------------------------------------------------------------------------
 \section{Introduction}
-Combat sports present significant challenges for motion capture due to numerous close-proximity interactions and frequently crowded backgrounds. 
-Optical markers tracking is precise in a laboratory setting, yet are impractical for combat sports due to the highly dynamic motions and frequent collisions that lead to calibration issues with markers. Inertial measurement unit (IMU) based solutions suffer from global positional drift, affecting inter-athlete distances. Monocular vision-based approaches leave athletes unencumbered by tracking equipment, but they lack precision due to insufficient visual data arising from frequent occlusions. Issues due to occlusion can however be mitigated by incorporating camera data from multiple viewpoints, an idea that we built on in our tracking pipeline.
+Combat sports present significant challenges for motion capture due to numerous close-proximity interactions and frequently crowded backgrounds. Optical marker-based tracking, while precise in controlled environments, becomes impractical due to dynamic motions and frequent collisions leading to calibration issues. Inertial measurement unit (IMU) based solutions suffer from global positional drift, affecting inter-athlete distances. Monocular vision-based approaches, though freeing athletes from tracking equipment, often lack precision due to frequent occlusions. However, these occlusions can be mitigated by incorporating data from multiple camera viewpoints, a cornerstone of our tracking pipeline.
 
-We propose a multi-stage multi-view tracking pipeline that is capable of reconstructing high-quality 3D motion of athletes participating in combat sports, such as boxing. Our approach fuses 2D keypoints from multiple camera views by a kinematic optimization.  This is followed by a physics-based trajectory optimization utilizing model predictive control to eliminate non-physical artifacts.
-
-The experiments presented in the results section of this paper demonstrate that 
-our approach is capable of reconstructing complex movements while considering 
-various physical constraints, such as contact dynamics and collisions. 
-We evaluate our pipeline using multi-view footage of
-elite-level boxers in a ring as illustrated in Figure~\ref{fig:teaser}. 
+We propose a multi-stage, multi-view tracking pipeline designed to reconstruct high-quality 3D motion of athletes engaged in combat sports such as boxing. Our approach integrates 2D keypoints from multiple camera views through kinematic optimization, followed by physics-based trajectory refinement using model predictive control to eliminate non-physical artifacts. 
 The contributions of our work are summarized as follows:
 \begin{itemize}
     \item A comprehensive multi-camera multi-person physics based pose estimation framework designed for high-quality 3D pose estimation using as few as three cameras.
@@ -186,36 +179,41 @@ The contributions of our work are summarized as follows:
     \caption{Poses estimated from the Campus, Shelf and supplementary datasets}
     \label{fig:qualitative}
 \end{figure*}
-\begin{table*}[t]
-  \caption{Comparison of PCP[\% $\uparrow$] results on the Campus and Shelf datasets.}
-  \centering
-  \resizebox{\textwidth}{!}{%
-    \begin{tabular}{@{}r|cccc|cccc@{}}
-      \toprule
-      Method & \multicolumn{4}{c|}{Campus} & \multicolumn{4}{c}{Shelf} \\
-      \cmidrule(r){2-5} \cmidrule(l){6-9}
-      & Actor 1 & Actor 2 & Actor 3 & Avg. & Actor 1 & Actor 2 & Actor 3 & Avg.\\
-      \midrule
+% \begin{table*}[t]
+%   \caption{Comparison of PCP[\% $\uparrow$] results on the Campus and Shelf datasets.}
+%   \centering
+%   \resizebox{\textwidth}{!}{%
+%     \begin{tabular}{@{}r|cccc|cccc@{}}
+%       \toprule
+%       Method & \multicolumn{4}{c|}{Campus} & \multicolumn{4}{c}{Shelf} \\
+%       \cmidrule(r){2-5} \cmidrule(l){6-9}
+%       & Actor 1 & Actor 2 & Actor 3 & Avg. & Actor 1 & Actor 2 & Actor 3 & Avg.\\
+%       \midrule
   
-     ~\cite{wang2021} & 99.3 & 95.1 & 97.8 & 97.4 & 98.2 & 94.1 & 97.4 & 96.6 \\ 
-     ~\cite{yang2023unified} & 98.2 & 94.6 & 98.2 & 97.0 & 99.5 & 96.0 & 97.7 & 97.7 \\       
-      ours (Triangulation) & \textbf{99.6} & 92.2 & 97.6 & 96.5 & \textbf{99.8} & 95.4 & \textbf{98.6} & \textbf{97.9} \\ 
-      ours (Kinematics) & 98.5 & 93.5 & 94.4 & 95.5 & \textbf{99.8} & \textbf{97.6} & \textbf{98.6} & \textbf{98.6} \\
-      ours (Dynamics) & 97.7 & 93.6 & 94.2 & 95.1 & 97.1 & \textbf{97.6} & 97.2 & 97.3 \\
-      \bottomrule
-    \end{tabular}%
-  }
-  \label{tab:benchmark}
-\end{table*}
+%      ~\cite{wang2021} & 99.3 & 95.1 & 97.8 & 97.4 & 98.2 & 94.1 & 97.4 & 96.6 \\ 
+%      ~\cite{yang2023unified} & 98.2 & 94.6 & 98.2 & 97.0 & 99.5 & 96.0 & 97.7 & 97.7 \\       
+%       ours (Triangulation) & \textbf{99.6} & 92.2 & 97.6 & 96.5 & \textbf{99.8} & 95.4 & \textbf{98.6} & \textbf{97.9} \\ 
+%       ours (Kinematics) & 98.5 & 93.5 & 94.4 & 95.5 & \textbf{99.8} & \textbf{97.6} & \textbf{98.6} & \textbf{98.6} \\
+%       ours (Dynamics) & 97.7 & 93.6 & 94.2 & 95.1 & 97.1 & \textbf{97.6} & 97.2 & 97.3 \\
+%       \bottomrule
+%     \end{tabular}%
+%   }
+%   \label{tab:benchmark}
+% \end{table*}
 \section{Pose Estimation}
 
-\textbf{Tracking 2D and 3D Data:} Using epipolar constraints and long-term video object segmentation we produce consistent ids for everyone, these ids are used to produce 2D joints positions for tracking targets, we then use linear triangulation and Kalman estimation to produce robust 3D joints positions for each individual even in the presence of noise and outliers.   
+%-------------------------------------------------------------------------
+
+\textbf{Tracking 2D and 3D Data:} Using epipolar constraints and long-term video object segmentation~\cite{cheng2022xmem} we produce consistent ids for everyone, these ids are used to produce 2D joints positions using~\cite{xu2022vitpose} for tracking targets, we then use linear triangulation and Kalman estimation to produce robust 3D joints positions for each individual even in the presence of noise and outliers.   
 \begin{figure*}[!ht]
 \includegraphics[width=0.73\linewidth]{pipeline.pdf}
  \centering
   \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
   \label{fig:teaser}
 \end{figure*}
+
+%-------------------------------------------------------------------------
+
 \textbf{Kinematics Optimization:} The kinematics optimization focuses on refining the pose estimation of athletes using 2D and 3D keypoint data. Employing the SMPL model, the optimization aims to minimize the disparity between model joints and observed data while ensuring temporal coherence and natural movement. This is achieved through a comprehensive objective function that includes terms for smoothness, similarity to human motion priors, and alignment with both 2D re-projection evidence and triangulated 3D keypoints.
 
 Initially, the optimization initializes shape parameters ($\beta \in \mathbb{R}^{10}$) of the SMPL model based on 3D keypoints obtained through triangulation. Subsequently, it iteratively adjusts shape and pose parameters ($\theta \in \mathbb{R}^{72}$) to refine the pose estimation.
