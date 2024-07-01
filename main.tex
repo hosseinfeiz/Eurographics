@@ -160,25 +160,7 @@ The contributions of our work are summarized as follows:
 
 \label{sec:results} 
 
-\begin{figure*}[htb]
-    \centering
-    \begin{minipage}[b]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figures/campus2.png}
-    \end{minipage}%
-    \hspace{0.01\textwidth}
-    \begin{minipage}[b]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figures/shelf.png}
-    \end{minipage}%
-    \hspace{0.01\textwidth}
-    \begin{minipage}[b]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figures/supp.png}
-    \end{minipage}%
-    \caption{Poses estimated from the Campus, Shelf and supplementary datasets}
-    \label{fig:qualitative}
-\end{figure*}
+
 % \begin{table*}[t]
 %   \caption{Comparison of PCP[\% $\uparrow$] results on the Campus and Shelf datasets.}
 %   \centering
@@ -211,7 +193,25 @@ The contributions of our work are summarized as follows:
   \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
   \label{fig:pipeline}
 \end{figure*}
-
+\begin{figure*}[htb]
+    \centering
+    \begin{minipage}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/campus2.png}
+    \end{minipage}%
+    \hspace{0.01\textwidth}
+    \begin{minipage}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/shelf.png}
+    \end{minipage}%
+    \hspace{0.01\textwidth}
+    \begin{minipage}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/supp.png}
+    \end{minipage}%
+    \caption{Poses estimated from the Campus, Shelf and supplementary datasets}
+    \label{fig:qualitative}
+\end{figure*}
 %-------------------------------------------------------------------------
 
 \textbf{Kinematics Optimization:} The kinematics optimization focuses on refining the pose estimation of athletes using 2D and 3D keypoint data. Employing the SMPL model, the optimization aims to minimize the disparity between model joints and observed data while ensuring temporal coherence and natural movement. This is achieved through a comprehensive objective function that includes terms for smoothness, similarity to human motion priors, and alignment with both 2D re-projection evidence and triangulated 3D keypoints.
