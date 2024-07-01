@@ -12,7 +12,24 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{float}
+\usepackage{booktabs} % For \toprule, \midrule, \bottomrule
+\usepackage{array} 
 \usepackage{cite}  % comment out for biblatex with backend=biber
+% ---------------------------
+%\biberVersion
+\BibtexOrBiblatex
+%\usepackage[backend=biber,bibstyle=EG,citestyle=alphabetic,backref=true]{biblatex} 
+%\addbibresource{egbibsample.bib}
+% ---------------------------  
+\electronicVersion
+\PrintedOrElectronic
+% for including postscript figures
+% mind: package option 'draft' will replace PS figure by a filename within a frame
+% \ifpdf \usepackage[pdftex]{graphicx} \pdfcompresslevel=9
+% \else \usepackage[dvips]{graphicx} \fi
+
+
+\usepackage{egweblnk} 
 \usetikzlibrary{arrows, decorations.markings, arrows.meta,positioning,shadows,shapes.geometric,automata,positioning,fit,arrows.meta,calc,bending}
  
 % --- for  Annual CONFERENCE
@@ -60,23 +77,7 @@
 % !! *please* don't change anything above
 % !! unless you REALLY know what you are doing
 % ------------------------------------------------------------------------
-\usepackage[T1]{fontenc}
-\usepackage{dfadobe}  
-\usepackage{cite}  % comment out for biblatex with backend=biber
-% ---------------------------
-%\biberVersion
-\BibtexOrBiblatex
-%\usepackage[backend=biber,bibstyle=EG,citestyle=alphabetic,backref=true]{biblatex} 
-%\addbibresource{egbibsample.bib}
-% ---------------------------  
-\electronicVersion
-\PrintedOrElectronic
-% for including postscript figures
-% mind: package option 'draft' will replace PS figure by a filename within a frame
-% \ifpdf \usepackage[pdftex]{graphicx} \pdfcompresslevel=9
-% \else \usepackage[dvips]{graphicx} \fi
 
-\usepackage{egweblnk} 
 % end of prologue
 
 \title{Markerless Multi-view and Multi-person Tracking for Combat Sports}
@@ -120,7 +121,7 @@
 
 \begin{abstract}
    Combat sports pose significant challenges for motion capture due to dynamic interactions and crowded backgrounds. Traditional methods like optical marker tracking, IMU-based solutions are not practical due to their intrusive nature, and Monocular vision-based approaches are affected by occlusions, encouraging the development of a multi-stage, multi-view tracking pipeline. This pipeline utilizes kinematic optimization to fuse 2D keypoints from multiple cameras, followed by physics-based trajectory optimization using model predictive control to enhance realism.
-   Furthermore, leveraging interaction datasets attain from multi-view setup, the pipeline supports multi-person motion synthesis. It employs a seq2seq model to generate interactions from sparse VR headset inputs, and a diffusion prior model to generate the whole body poses. Finally, latent optimization ensures motions adhere to motion prior and satisfies high level criteria by producing controllable animations, suitable for combat sports analysis and training applications.
+
 
 \begin{CCSXML}
 <ccs2012>
@@ -145,21 +146,82 @@
 \end{abstract}  
 %-------------------------------------------------------------------------
 \section{Introduction}
-We propose a multi-stage, multi-view tracking pipeline that uses kinematic and dynamics optimization to fuse 2D keypoints from multiple cameras. Additionally, our pipeline supports multi-person motion synthesis using interaction datasets from a multi-view tracking pipeline, employing a seq2seq model to generate interactions from sparse VR headset inputs and a diffusion prior model to produce whole-body poses. Latent optimization ensures that the motions adhere to motion priors and meet high-level criteria, making the system suitable for combat sports analysis and training.
+Combat sports present significant challenges for motion capture due to numerous close-proximity interactions and frequently crowded backgrounds. 
+Optical markers tracking is precise in a laboratory setting, yet are impractical for combat sports due to the highly dynamic motions and frequent collisions that lead to calibration issues with markers. Inertial measurement unit (IMU) based solutions suffer from global positional drift, affecting inter-athlete distances. Monocular vision-based approaches leave athletes unencumbered by tracking equipment, but they lack precision due to insufficient visual data arising from frequent occlusions. Issues due to occlusion can however be mitigated by incorporating camera data from multiple viewpoints, an idea that we built on in our tracking pipeline.
+
+We propose a multi-stage multi-view tracking pipeline that is capable of reconstructing high-quality 3D motion of athletes participating in combat sports, such as boxing. Our approach fuses 2D keypoints from multiple camera views by a kinematic optimization.  This is followed by a physics-based trajectory optimization utilizing model predictive control to eliminate non-physical artifacts.
+
+The experiments presented in the results section of this paper demonstrate that 
+our approach is capable of reconstructing complex movements while considering 
+various physical constraints, such as contact dynamics and collisions. 
+We evaluate our pipeline using multi-view footage of
+elite-level boxers in a ring as illustrated in Figure~\ref{fig:teaser}. 
+The contributions of our work are summarized as follows:
+\begin{itemize}
+    \item A comprehensive multi-camera multi-person physics based pose estimation framework designed for high-quality 3D pose estimation using as few as three cameras.
+    \item A robust triangulation technique employing spline fitting and Kalman filtering to generate consistent and smooth 3D positions.
+    \item A high-quality dataset of video footage featuring elite boxers during intense sparring sessions. The dataset encompasses various boxing styles, presenting a valuable new benchmark in 3D pose estimation. We will release a portion of the dataset (20 minutes) and motion data obtained to advance research in competitive sports.
+\end{itemize}
+
+
+
+\label{sec:results} 
+
+\begin{figure*}[htb]
+    \centering
+    \begin{minipage}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/campus2.png}
+    \end{minipage}%
+    \hspace{0.01\textwidth}
+    \begin{minipage}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/shelf.png}
+    \end{minipage}%
+    \hspace{0.01\textwidth}
+    \begin{minipage}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/supp.png}
+    \end{minipage}%
+    \caption{Poses estimated from the Campus, Shelf and supplementary datasets}
+    \label{fig:qualitative}
+\end{figure*}
+\begin{table*}[t]
+  \caption{Comparison of PCP[\% $\uparrow$] results on the Campus and Shelf datasets.}
+  \centering
+  \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}r|cccc|cccc@{}}
+      \toprule
+      Method & \multicolumn{4}{c|}{Campus} & \multicolumn{4}{c}{Shelf} \\
+      \cmidrule(r){2-5} \cmidrule(l){6-9}
+      & Actor 1 & Actor 2 & Actor 3 & Avg. & Actor 1 & Actor 2 & Actor 3 & Avg.\\
+      \midrule
+  
+     ~\cite{wang2021} & 99.3 & 95.1 & 97.8 & 97.4 & 98.2 & 94.1 & 97.4 & 96.6 \\ 
+     ~\cite{yang2023unified} & 98.2 & 94.6 & 98.2 & 97.0 & 99.5 & 96.0 & 97.7 & 97.7 \\       
+      ours (Triangulation) & \textbf{99.6} & 92.2 & 97.6 & 96.5 & \textbf{99.8} & 95.4 & \textbf{98.6} & \textbf{97.9} \\ 
+      ours (Kinematics) & 98.5 & 93.5 & 94.4 & 95.5 & \textbf{99.8} & \textbf{97.6} & \textbf{98.6} & \textbf{98.6} \\
+      ours (Dynamics) & 97.7 & 93.6 & 94.2 & 95.1 & 97.1 & \textbf{97.6} & 97.2 & 97.3 \\
+      \bottomrule
+    \end{tabular}%
+  }
+  \label{tab:benchmark}
+\end{table*}
 \section{Pose Estimation}
 
 \textbf{Tracking 2D and 3D Data:} Using epipolar constraints and long-term video object segmentation we produce consistent ids for everyone, these ids are used to produce 2D joints positions for tracking targets, we then use linear triangulation and Kalman estimation to produce robust 3D joints positions for each individual even in the presence of noise and outliers.   
-
+\begin{figure*}[!ht]
+\includegraphics[width=0.73\linewidth]{pipeline.pdf}
+ \centering
+  \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
+  \label{fig:teaser}
+\end{figure*}
 \textbf{Kinematics Optimization:} The kinematics optimization focuses on refining the pose estimation of athletes using 2D and 3D keypoint data. Employing the SMPL model, the optimization aims to minimize the disparity between model joints and observed data while ensuring temporal coherence and natural movement. This is achieved through a comprehensive objective function that includes terms for smoothness, similarity to human motion priors, and alignment with both 2D re-projection evidence and triangulated 3D keypoints.
 
 Initially, the optimization initializes shape parameters ($\beta \in \mathbb{R}^{10}$) of the SMPL model based on 3D keypoints obtained through triangulation. Subsequently, it iteratively adjusts shape and pose parameters ($\theta \in \mathbb{R}^{72}$) to refine the pose estimation.
 
 Key components of the objective function include:
-\begin{figure*}[htp]
-\includegraphics[width=0.73\linewidth]{pipeline.pdf}
- \centering
-  \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
-\end{figure*}
+
 \begin{itemize}
     \item \textbf{2D Re-projection Loss} ($\mathrm{L}_\text{2D}$): Aligns 3D joints with 2D joints across multiple camera views, emphasizing joints with high-confidence detections using a robust error function.
     \item \textbf{3D Alignment Loss} ($\mathrm{L}_\text{3D}$): Computes the Euclidean distance between predicted 3D joint positions and triangulated 3D keypoints, weighted by their confidence scores.
@@ -174,32 +236,10 @@ Key components of the objective function include:
 
 The dynamics optimization stage aims to refine motion trajectories by considering joint torques and biomechanical constraints within a physical environment. It computes joint torques using an iterative Linear Quadratic Regulator (iLQR) algorithm, which optimizes control inputs to smooth and stabilize motion trajectories. This approach accounts for contact forces and body dynamics, enhancing the overall quality and naturalness of the generated motions by iteratively refining control trajectories over short time horizons.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics{condiffusion}
-  \caption{motion synthesis pipeline}
-    \label{fig:condtion-diffusion}
-\end{figure}
-
-Figure~\ref{fig:condtion-diffusion} illustrate the main components of the motion synthesis pipeline. The condition for the seq2seq model contains the VR sensor information of the player and the output is the corresponding synthetic VR information for the opponent at each sequence. The diffusion prior is conditioned on the opponent synthetic information and produces the whole body pose for the opponent. The optimization in loop makes sure the output motion has the desired trajectories based on a high-level loss function.
 
 
-
-\section{Motion Synthesis}
-%---------------------------------------------------------------------
-\textbf{Diff Seq2Seq: Interaction Diffusion Model}
- 
-A novel application of sequence-to-sequence (seq2seq) models in virtual reality involves generating responsive opponent motions based on sparse VR input data. In this context, the seq2seq model trained on the interaction dataset translating the sparse signals captured from VR sensors into synthetic VR signals for the virtual opponents. Trained on a specialized multi-person boxing dataset, the model learns to map the sparse input, into coherent sequences of actions that simulate human-like behavior during a boxing match. By leveraging the dataset’s diverse scenarios and real-world motion variations, the seq2seq model not only predicts the opponent’s reactions but also adapts to different player actions, enhancing the realism and engagement of VR gaming experiences. This approach marks a significant advancement in interactive VR applications by bridging the gap between sparse sensor data and immersive virtual interactions.
-
-%---------------------------------------------------------------------
-\textbf{Conditioned Diffprior: Sparse inputs to whole body pose}
-This approach overcomes the inherent challenges of accurately predicting smooth and realistic full-body motions with minimal input data. By leveraging a lightweight MLP architecture and employing a block-wise injection scheme for embedding time step information, the conditional diffusion model effectively reduces artifacts like jittering and enhances robustness against signal loss.
-% The conditional diffusion model architecture optimizes computational efficiency while maintaining high accuracy in estimating full-body poses, making it suitable for immersive VR experiences demanding fluid and responsive interactions.
-
-%---------------------------------------------------------------------
-\textbf{Latent Optimization: Controlled motion synthesis}
-
-Optimize noisy motion inputs directly in the latent space of the diffusion model. By treating motion denoising as a black box and iteratively adjusts the diffusion noise vector using gradients computed through an ODE solver, ensuring the output motion meets user-defined criteria. This approach avoids the need for fine-tuning models for specific tasks, demonstrating superior performance in motion editing, preservation, and task fulfillment compared to existing methods.
+\bibliographystyle{eg-alpha-doi} 
+\bibliography{bibliography} 
 
 \end{document}
-{}
+
