@@ -148,7 +148,7 @@
 \section{Introduction}
 Combat sports present significant challenges for motion capture due to numerous close-proximity interactions and frequently crowded backgrounds. Optical marker-based tracking, while precise in controlled environments, becomes impractical due to dynamic motions and frequent collisions leading to calibration issues. Inertial measurement unit (IMU) based solutions suffer from global positional drift, affecting inter-athlete distances. Monocular vision-based approaches, though freeing athletes from tracking equipment, often lack precision due to frequent occlusions. However, these occlusions can be mitigated by incorporating data from multiple camera viewpoints, a cornerstone of our tracking pipeline.
 
-We propose a multi-stage, multi-view tracking pipeline designed to reconstruct high-quality 3D motion of athletes engaged in combat sports such as boxing. Our approach integrates 2D keypoints from multiple camera views through kinematic optimization, followed by physics-based trajectory refinement using model predictive control to eliminate non-physical artifacts. 
+We propose a multi-stage, multi-view tracking pipeline shown in Fig~\ref{fig:pipeline} designed to reconstruct high-quality 3D motion of athletes engaged in combat sports such as boxing. Our approach integrates 2D keypoints from multiple camera views through kinematic optimization, followed by physics-based trajectory refinement using model predictive control to eliminate non-physical artifacts. 
 The contributions of our work are summarized as follows:
 \begin{itemize}
     \item A comprehensive multi-camera multi-person physics based pose estimation framework designed for high-quality 3D pose estimation using as few as three cameras.
@@ -206,10 +206,10 @@ The contributions of our work are summarized as follows:
 
 \textbf{Tracking 2D and 3D Data:} Using epipolar constraints and long-term video object segmentation~\cite{cheng2022xmem} we produce consistent ids for everyone, these ids are used to produce 2D joints positions using~\cite{xu2022vitpose} for tracking targets, we then use linear triangulation and Kalman estimation to produce robust 3D joints positions for each individual even in the presence of noise and outliers.   
 \begin{figure*}[!ht]
-\includegraphics[width=0.73\linewidth]{pipeline.pdf}
+\includegraphics[width=0.75\linewidth]{pipeline.pdf}
  \centering
   \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
-  \label{fig:teaser}
+  \label{fig:pipeline}
 \end{figure*}
 
 %-------------------------------------------------------------------------
@@ -226,13 +226,13 @@ Key components of the objective function include:
     \item \textbf{Smoothness Loss} ($\mathrm{L}_\text{smooth}$): Promotes consistency in pose transitions over time frames and vertices of the posed mesh.
     \item \textbf{Prior Losses} ($\mathrm{L}_{\text{GMM}}$, $\mathrm{L}_{\text{Vposer}}$): Introduces Gaussian Mixture Model (GMM) and Vposer priors to penalize unnatural poses, guiding the optimization towards more realistic and fluid motion.
 \end{itemize}
- This comprehensive approach ensures accurate and lifelike pose estimation suitable for applications in sports biomechanics and animation.
+ This comprehensive approach ensures accurate and lifelike pose estimation suitable for applications in sports biomechanics and animation. Fig~\ref{fig:qualitative} shows the qualitative results of the pipeline on different datasets.
 
 %-------------------------------------------------------------------------
 
 \textbf{Dynamics Optimization:} Output motion of the kinematics optimization contains high-frequency artifacts. To mitigate this, a second stage employs dynamics optimization using a physics-based humanoid model. This model, derived from joint positions and landmarks of an SMPL mesh, creates an articulated rigid-body structure with capsule collision geometry, featuring 56 joint-angle degrees of freedom and a 6 degree of freedom root joint.
 
-The dynamics optimization stage aims to refine motion trajectories by considering joint torques and biomechanical constraints within a physical environment. It computes joint torques using an iterative Linear Quadratic Regulator (iLQR) algorithm, which optimizes control inputs to smooth and stabilize motion trajectories. This approach accounts for contact forces and body dynamics, enhancing the overall quality and naturalness of the generated motions by iteratively refining control trajectories over short time horizons.
+The dynamics optimization stage aims to refine motion trajectories by considering joint torques and biomechanical constraints within a physical environment. It computes joint torques using an iterative Linear Quadratic Regulator (iLQR) algorithm~\cite{howell2022}, which optimizes control inputs to smooth and stabilize motion trajectories. This approach accounts for contact forces and body dynamics, enhancing the overall quality and naturalness of the generated motions by iteratively refining control trajectories over short time horizons.
 
 
 
