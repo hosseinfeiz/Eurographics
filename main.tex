@@ -15,6 +15,8 @@
 \usepackage{booktabs} % For \toprule, \midrule, \bottomrule
 \usepackage{array} 
 \usepackage{cite}  % comment out for biblatex with backend=biber
+\usepackage{multirow}
+\usepackage{enumitem}
 % ---------------------------
 %\biberVersion
 \BibtexOrBiblatex
@@ -80,7 +82,7 @@
 
 % end of prologue
 
-\title{Markerless Multi-view and Multi-person Tracking for Combat Sports}
+\title{Markerless Multi-view Multi-person Tracking for Combat Sports}
 
 % for anonymous conference submission please enter your SUBMISSION ID
 % instead of the author's name (and leave the affiliation blank) !!
@@ -120,8 +122,7 @@
 %-------------------------------------------------------------------------
 
 \begin{abstract}
-   This poster introduces a novel framework for 3D pose estimation in combat sports. Utilizing a sparse multi-camera setup, our approach employs a computer vision-based tracker to extract 2D pose predictions from each camera view, enforcing consistent tracking targets across views with epipolar constraints and long-term video object segmentation. Through a top-down transformer-based approach, we ensure high-quality 2D pose extraction. We estimate the 3D position via weighted triangulation, spline fitting and extended Kalman filtering. By employing kinematic optimization and physics-based trajectory refinement, we achieve state-of-the-art accuracy and robustness under challenging conditions such as occlusion and rapid movements. Experimental validation on diverse datasets, including a custom dataset featuring elite boxers, underscores the effectiveness of our approach. Additionally, we contribute a valuable sparring video dataset to advance research in multi-person tracking for sports.
-
+   We introduce a novel framework for 3D pose estimation in combat sports. Utilizing a sparse multi-camera setup, our approach employs a computer vision-based tracker to extract 2D pose predictions from each camera view, enforcing consistent tracking targets across views with epipolar constraints and long-term video object segmentation. Through a top-down transformer-based approach, we ensure high-quality 2D pose extraction. We estimate the 3D position via weighted triangulation, spline fitting and extended Kalman filtering. By employing kinematic optimization and physics-based trajectory refinement, we achieve state-of-the-art accuracy and robustness under challenging conditions such as occlusion and rapid movements. Experimental validation on diverse datasets, including a custom dataset featuring elite boxers, underscores the effectiveness of our approach. Additionally, we contribute a valuable sparring video dataset to advance research in multi-person tracking for sports.
 
 \begin{CCSXML}
 <ccs2012>
@@ -139,7 +140,7 @@
 \end{CCSXML}
 
 \ccsdesc[300]{Computing methodologies~Pose Estimation}
-\ccsdesc[300]{Computing methodologies~Motion synthesis}
+\ccsdesc[300]{Computing methodologies~Optimization}
 
 
 \printccsdesc   
@@ -151,9 +152,9 @@ Combat sports present significant challenges for motion capture due to numerous 
 We propose a multi-stage, multi-view tracking pipeline shown in Fig~\ref{fig:pipeline} designed to reconstruct high-quality 3D motion of athletes engaged in combat sports such as boxing. Our approach integrates 2D keypoints from multiple camera views through kinematic optimization, followed by physics-based trajectory refinement using model predictive control to eliminate non-physical artifacts. 
 The contributions of our work are summarized as follows:
 \begin{itemize}
-    \item A comprehensive multi-camera multi-person physics based pose estimation framework designed for high-quality 3D pose estimation using as few as three cameras.
+    \item A comprehensive multi-camera multi-person physics-based pose estimation framework designed for high-quality 3D pose estimation using as few as three cameras.
     \item A robust triangulation technique employing spline fitting and Kalman filtering to generate consistent and smooth 3D positions.
-    \item A high-quality dataset of video footage featuring elite boxers during intense sparring sessions. The dataset encompasses various boxing styles, presenting a valuable new benchmark in 3D pose estimation. We will release a portion of the dataset (20 minutes) and motion data obtained to advance research in competitive sports.
+    \item A high-quality dataset of >~20 minutes of video footage featuring elite boxers during sparring sessions that encompasses several boxing styles, plus a multi-view dataset of motions representative of combat sports and synchronized with ground truth from an optical marker tracking system. We will release these datasets and the solved motions.
 \end{itemize}
 
 
@@ -184,14 +185,16 @@ The contributions of our work are summarized as follows:
 % \end{table*}
 \section{Pose Estimation}
 
+Our tracking pipeline is summarized in Fig.~\ref{fig:pipeline}. We describe the main stages below.
 %-------------------------------------------------------------------------
 
-\textbf{Tracking 2D and 3D Data:} Using epipolar constraints and long-term video object segmentation~\cite{cheng2022xmem} we produce consistent ids for everyone, these ids are used to produce 2D joints positions using~\cite{xu2022vitpose} for tracking targets, we then use linear triangulation and Kalman estimation to produce robust 3D joints positions for each individual even in the presence of noise and outliers.   
+\textbf{Tracking 2D and 3D:} Using epipolar constraints and long-term video object segmentation~\cite{cheng2022xmem} we produce consistent ids for everyone, these ids are used to produce 2D joints positions using~\cite{xu2022vitpose} for tracking targets. We then use linear triangulation and Kalman estimation to produce robust 3D joints positions for each individual, even in the presence of noise and outliers.   
 \begin{figure*}[!ht]
 \includegraphics[width=0.75\linewidth]{pipeline.pdf}
  \centering
-  \caption{The pipeline begins with generating bounding boxes  and robust tracking  for each individual in the scene. These tracking results are used to produce 2D poses. The triangulation process, produces smooth 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints, to create the SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state  and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct any artifacts in the motion.}
+  \caption{Our pipeline begins with generating bounding boxes and tracking ids for each individual in the scene, which are then used to produce 2D poses for each individual for each view $j$. A triangulation process is then used to compute 3D keypoints. The kinematics optimization step incorporates the 2D and 3D keypoints to compute SMPL parameters ($\mathbf{\theta}$, $\mathbf{\beta}$). The 3D relative joint positions, initial pose state and velocity state of the humanoid, serve as a reference for a dynamic optimizer to correct artifacts in the motion.}
   \label{fig:pipeline}
+  \vspace{-8pt}
 \end{figure*}
 \begin{figure*}[htb]
     \centering
@@ -209,32 +212,42 @@ The contributions of our work are summarized as follows:
         \centering
         \includegraphics[width=\linewidth]{figures/supp.png}
     \end{minipage}%
-    \caption{Poses estimated from the Campus, Shelf and supplementary datasets}
+    \caption{Poses estimated from the Campus (left), Shelf (middle) datasets, and our custom supplementary (right) dataset. }
     \label{fig:qualitative}
+    \vspace{-16pt}
 \end{figure*}
 %-------------------------------------------------------------------------
 
-\textbf{Kinematics Optimization:} The kinematics optimization focuses on refining the pose estimation of athletes using 2D and 3D keypoint data. Employing the SMPL model, the optimization aims to minimize the disparity between model joints and observed data while ensuring temporal coherence and natural movement. This is achieved through a comprehensive objective function that includes terms for smoothness, similarity to human motion priors, and alignment with both 2D re-projection evidence and triangulated 3D keypoints.
-
-Initially, the optimization initializes shape parameters ($\beta \in \mathbb{R}^{10}$) of the SMPL model based on 3D keypoints obtained through triangulation. Subsequently, it iteratively adjusts shape and pose parameters ($\theta \in \mathbb{R}^{72}$) to refine the pose estimation.
-
-Key components of the objective function include:
-
+\textbf{Kinematics Optimization:} The kinematics optimization focuses on refining the pose estimation of athletes using 2D and 3D keypoint data. Fig~\ref{fig:qualitative} shows the results of the kinematics stage on different datasets.
+%Employing the SMPL model, the optimization aims to minimize the disparity between model joints and observed data while ensuring temporal coherence and natural movement. 
+The optimization initializes shape parameters ($\beta \in \mathbb{R}^{10}$) of the SMPL model based on 3D keypoints obtained through triangulation. Subsequently, it iteratively adjusts shape and pose parameters ($\theta \in \mathbb{R}^{72}$) to refine the pose estimation based on objectives for smoothness, similarity to human motion priors, and alignment with both 2D re-projection evidence and triangulated 3D keypoints. We summarize these objective terms below: 
 \begin{itemize}
-    \item \textbf{2D Re-projection Loss} ($\mathrm{L}_\text{2D}$): Aligns 3D joints with 2D joints across multiple camera views, emphasizing joints with high-confidence detections using a robust error function.
-    \item \textbf{3D Alignment Loss} ($\mathrm{L}_\text{3D}$): Computes the Euclidean distance between predicted 3D joint positions and triangulated 3D keypoints, weighted by their confidence scores.
-    \item \textbf{Smoothness Loss} ($\mathrm{L}_\text{smooth}$): Promotes consistency in pose transitions over time frames and vertices of the posed mesh.
-    \item \textbf{Prior Losses} ($\mathrm{L}_{\text{GMM}}$, $\mathrm{L}_{\text{Vposer}}$): Introduces Gaussian Mixture Model (GMM) and Vposer priors to penalize unnatural poses, guiding the optimization towards more realistic and fluid motion.
+    \item \textbf{2D Re-projection  loss} ($\mathrm{L}_\text{2D}$): Aligns 3D with 2D keypoints across multiple views, emphasizing high-confidence joints.
+    \item \textbf{3D Alignment loss} ($\mathrm{L}_\text{3D}$): Distance between predicted joint locations and triangulated keypoints, weighted by their confidence.
+    \item \textbf{Smoothness loss} ($\mathrm{L}_\text{smooth}$): Promotes temporal coherency in pose transitions from frame-to-frame.
+    \item \textbf{Prior losses} ($\mathrm{L}_{\text{GMM}}$, $\mathrm{L}_{\text{Vposer}}$): Gaussian Mixture Model (GMM) and Vposer~\cite{Vposer} priors to penalize unnatural poses.
 \end{itemize}
- This comprehensive approach ensures accurate and lifelike pose estimation suitable for applications in sports biomechanics and animation. Fig~\ref{fig:qualitative} shows the qualitative results of the pipeline on different datasets.
-
 %-------------------------------------------------------------------------
 
-\textbf{Dynamics Optimization:} Output motion of the kinematics optimization contains high-frequency artifacts. To mitigate this, a second stage employs dynamics optimization using a physics-based humanoid model. This model, derived from joint positions and landmarks of an SMPL mesh, creates an articulated rigid-body structure with capsule collision geometry, featuring 56 joint-angle degrees of freedom and a 6 degree of freedom root joint.
+\textbf{Dynamics Optimization:} Motions produced by the kinematic stage often contain high-frequency jitter and foot skating. We found that a dynamics optimization using a physics-based humanoid model helps to mitigate these artifacts. The model consists of an articulated rigid-body structure with 56 joint-angle degrees of freedom, plus 6 degrees of freedom for the root motion. Capsule collision geometry aligned with SMPL landmarks comprises the shape. The dynamics optimization refines motion trajectories from the kinematics stage by considering joint torques and biomechanical constraints within the physical environment. Joint torques are computd using an iLQR algorithm~\cite{howell2022}, This approach accounts for contact forces and body dynamics, enhancing the overall quality and naturalness of the generated motions by iteratively refining control trajectories over short time horizons. Table~\ref{tab:physics} presents quantitative metrics computed using our supplementary dataset on the motions produced by the kinematics optimizaton stage and after the dynamics optimization. The dynamics optimization clearly increases the naturalness of the solved motions.
+%mean per joint position error (MPJPE), foot skating and floating error, and smoothness are presented in Table
 
-The dynamics optimization stage aims to refine motion trajectories by considering joint torques and biomechanical constraints within a physical environment. It computes joint torques using an iterative Linear Quadratic Regulator (iLQR) algorithm~\cite{howell2022}, which optimizes control inputs to smooth and stabilize motion trajectories. This approach accounts for contact forces and body dynamics, enhancing the overall quality and naturalness of the generated motions by iteratively refining control trajectories over short time horizons.
 
-
+\begin{table}[h]
+    \caption{MPJPE, foot skating and floating~\cite{Xie:2021aa}, and smoothness~\cite{Shimada_2020} metrics before and after the dynamics optimization.}
+    \centering
+    \begin{tabular}{cccccc}
+        \toprule
+        & \, & $e_{\text{MPJPE}}\downarrow$ & $e_{\text{foot},z}\downarrow$ & $e_{\text{foot},v_{xy}}\downarrow$ & $e_{\text{smooth}}\downarrow$ \\
+        \midrule
+        \midrule
+        & Kinematics & 41.2 &  16.4 & 2.2 & 6.1 \\
+        & Dynamics & 38.4 & 8.1 & 0.3 & 4.6 \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:physics}
+    \vspace{-12pt}
+\end{table}
 
 \bibliographystyle{eg-alpha-doi} 
 \bibliography{bibliography} 
